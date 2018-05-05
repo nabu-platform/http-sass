@@ -3,16 +3,23 @@ package be.nabu.libs.http.sass;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.text.ParseException;
+import java.util.Map;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import io.bit3.jsass.CompilationException;
+import io.bit3.jsass.Compiler;
+import io.bit3.jsass.Options;
+import io.bit3.jsass.Output;
+
 public class SassCompiler {
 	
 	public static void main(String...args) throws ScriptException, IOException, NoSuchMethodException {
-		new SassCompiler().compile2();
+		System.out.println(new SassCompiler().compile("$someVar: 123px; .some-selector { width: $someVar; }"));
 	}
 	
 	private Invocable invocable;
@@ -54,7 +61,7 @@ public class SassCompiler {
 //			                "    console.log(result.text);\n" +
 //			                "});";
 //					
-					final String compiler = "var compile = function(sass) { var result = null; Sass.compile(sass, function(compiled) { result = compiled.text }); return result; }";
+					final String compiler = "var compile = function(sass) { var result = null; Sass.compile(sass, function(compiled) { result = compiled }); return result; }";
 					engine.eval(compiler);
 					
 					invocable = (Invocable) engine;
@@ -64,17 +71,39 @@ public class SassCompiler {
 		return invocable;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public String compile(String sass) {
 		synchronized(this) {
 			try {
-				return (String) getInvocable().invokeFunction("compile", sass);
+				Map<String, Object> result = (Map<String, Object>) getInvocable().invokeFunction("compile", sass);
+				if ("0".equals(result.get("status").toString())) {
+					return (String) result.get("text");
+				}
+				else {
+					// other fields of interest: status,file,line,column,message,formatted
+					System.err.println(result.entrySet());
+					throw new ParseException(result.get("message") + "\n\n" + result.get("formatted"), 0);
+				}
 			}
 			catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		}
 	}
+	// uses: https://github.com/bit3/jsass
+	public String compile2(String sass) {
+		Compiler compiler = new Compiler();
+	    Options options = new Options();
+	    try {
+		    Output compileString = compiler.compileString(sass, options);
+		    return compileString.getCss();
+	    }
+	    catch (CompilationException e) {
+	    	throw new RuntimeException(e);
+	    }
+	}
 	
+	@SuppressWarnings("unchecked")
 	public void compile2() throws ScriptException, IOException, NoSuchMethodException {
 		final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         
@@ -111,15 +140,16 @@ public class SassCompiler {
 //                "    console.log(result.text);\n" +
 //                "});";
 //		
-		final String compiler = "var compile = function(sass) { var result = null; Sass.compile(sass, function(compiled) { result = compiled.text }); return result; }";
+		final String compiler = "var compile = function(sass) { var result = null; Sass.compile(sass, function(compiled) { console.log('compiled', compiled.message); result = compiled }); return result; }";
 		engine.eval(compiler);
 		
-		String sass = "$someVar: 123px; .some-selector { width: $someVar; }";
+		String sass = "$someVar: 123px; .some-selector { width: $someVar2; }";
 		
 		Invocable invocable = (Invocable) engine;
 
-		System.out.println("Return is: " + invocable.invokeFunction("compile", sass));
-		System.out.println("Return is: " + invocable.invokeFunction("compile", sass));
+		Map<String, Object> invokeFunction = (Map<String, Object>) invocable.invokeFunction("compile", sass);
+		
+		System.out.println("Return is: " + invokeFunction.values());
 	}
 	
 }
