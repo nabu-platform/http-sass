@@ -17,10 +17,11 @@
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/io.bit3/jsass -->
 		<dependency>
-			<groupId>io.bit3</groupId>
-			<artifactId>jsass</artifactId>
-			<version>5.7.1</version>
+		    <groupId>io.bit3</groupId>
+		    <artifactId>jsass</artifactId>
+		    <version>5.11.1</version>
 		</dependency>
+
 		
 		<!-- io.bit3-jsass depends on this but does not come with a correct maven descriptor in its jar, so we explicitly define it here -->
 		<dependency>
