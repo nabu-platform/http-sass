@@ -1,29 +1,22 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>be.nabu.libs.http</groupId>
 	<artifactId>http-sass</artifactId>
-	<version>${be.nabu.libs.http-http-sass-version}</version>
+	<version>1.0</version>
 	<packaging>jar</packaging>
 	<name>http-sass</name>
 	<url>http://nabu.be</url>
-
 	<parent>
 		<groupId>be.nabu</groupId>
 		<artifactId>core</artifactId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
-
 	<dependencies>
-		<!-- https://mvnrepository.com/artifact/io.bit3/jsass -->
 		<dependency>
-		    <groupId>io.bit3</groupId>
-		    <artifactId>jsass</artifactId>
-		    <version>5.11.1</version>
+			<groupId>io.bit3</groupId>
+			<artifactId>jsass</artifactId>
+			<version>5.11.1</version>
 		</dependency>
-
-		
-		<!-- io.bit3-jsass depends on this but does not come with a correct maven descriptor in its jar, so we explicitly define it here -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
